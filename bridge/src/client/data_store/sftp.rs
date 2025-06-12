@@ -129,7 +129,7 @@ impl Sftp {
                         match result {
                             Ok(_file) => {
                                 let mut file = Box::pin(TokioCompatFile::from(_file));
-                                match file.write(data).await {
+                                match file.write_all(data).await {
                                     Ok(_) => match file.flush().await {
                                         Ok(_) => {
                                             drop(file);
