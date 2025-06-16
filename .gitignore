@@ -15,7 +15,6 @@ target/
 
 # Ignore .env files
 .env
-.env.test
 
 # Added by cargo
 

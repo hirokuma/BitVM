@@ -3,7 +3,7 @@ Before running the demo for the first time, see [Environment Setup](#environment
 # Demo Prep: Funding UTXOs
 The bridge peg-in and peg-out execution consumes three funding UTXOs. For convenience, prepare them before running the demo. This process remains the same across all scenarios. You can use the recommended amounts as below:
 
-1. Peg-in graph - 'peg-in depost' tx input: **2097447 SAT** - will be spent by [DEPOSITOR] (use `-d` to get their address)
+1. Peg-in graph - 'peg-in deposit' tx input: **2097447 SAT** - will be spent by [DEPOSITOR] (use `-d` to get their address)
 2. Peg-out graph - 'peg-out confirm' tx input: **3562670 SAT** - will be spent by [OPERATOR] (use `-o` to get their address)
 3. Withdrawer peg-out - 'peg-out' tx input: **2097274 SAT** - will be spent by [OPERATOR] (use `-o` to get their address)
 
@@ -207,6 +207,14 @@ Record the peg-in confirm txid.
 # Environment Setup
 Clone and build this repository. The CLI executable is called `bridge`.
 
+## Build `bridge`
+
+Build in debug mode instead of release mode to make the data store local.
+
+```shell
+$ cargo build
+```
+
 ## [DEPOSITOR] and [OPERATOR] and [VERIFIER_0]
 All the above users can execute commands using a single setup (from the same directory).
 
@@ -258,4 +266,68 @@ export KEY_DIR="bitvm-bridge-verifier-1"
 
 # All verifier public keys
 export VERIFIERS="026cc14f56ad7e8fdb323378287895c6c0bcdbb37714c74fba175a0c5f0cd0d56f,02452556ed6dbac394cbb7441fbaf06c446d1321467fa5a138895c6c9e246793dd"
+```
+
+## This Environment
+
+### Run Bitcoin Regtest and Esplora
+
+[regtest/README.md](regtest/README.md)
+
+Run start.sh to generate blocks periodically.  
+To change the update interval, change `REGTEST_BLOCK_TIME` in the `/.env.test` file.
+
+```shell
+$ cd regtest
+$ ./install.sh
+$ ./start.sh
+```
+
+Use cli.sh to send Bitcoin to an address.
+
+```shell
+$ cd regtest
+$ ./cli.sh sendtoaddress <ADDRESS> <BTC amount>
+```
+
+You can view the blocks and transactions in your browser.
+
+[http://localhost:8094/regtest/](http://localhost:8094/regtest/)
+
+### Data Store settings
+
+BitVM data store support AWS S3 / FTP(S) / SFTP(Local is not supported in `v0.1.0-alpha`).  
+Edit `.env`(this environment uses SFTP).
+
+```env
+export BRIDGE_SFTP_HOST="bitvm-datastore"
+export BRIDGE_SFTP_PORT="22"
+export BRIDGE_SFTP_USERNAME="bitvm"
+# export BRIDGE_SFTP_KEYFILE_PATH="./id_ed25519"
+export BRIDGE_SFTP_BASE_PATH="/home/bitvm"
+```
+
+* Success `ssh bitvm@bitvm-datastore` without passphrase and `cd /home/bitvm`.
+* `BRIDGE_SFTP_KEYFILE_PATH` is ignored by BitVM.
+
+### Terminals
+
+#### user0
+
+For DEPOSITOR, OPERATOR, VERIFIER_0
+
+```console
+$ cd user0
+$ source prepare.sh
+$ ./clear.sh
+```
+
+#### user1
+
+For VERIFIER_1
+
+```console
+$ cd user1
+$ source prepare.sh
+$ ./clear.sh
 ```
