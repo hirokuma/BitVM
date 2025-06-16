@@ -88,7 +88,22 @@ pub struct BitVMClientPublicData {
 }
 
 impl BitVMClientPublicData {
+    pub fn list_graphs(&self) {
+        println!("[DEBUG] peg-ins:  {}", self.peg_in_graphs.len());
+        for id in self.peg_in_graphs.iter().map(|x| x.id()) {
+            println!("[DEBUG]   peg-in:  {}", id);
+        }
+        println!("[DEBUG] peg-outs: {}", self.peg_out_graphs.len());
+        // if self.peg_out_graphs.len() == 0 {
+        //     panic!("[DEBUG PANIC!!!] No peg-out graphs found");
+        // }
+        for id in self.peg_out_graphs.iter().map(|x| x.id()) {
+            println!("[DEBUG]   peg-out: {}", id);
+        }
+    }
+
     pub fn graph_mut(&mut self, graph_id: &GraphId) -> &mut dyn BaseGraph {
+        self.list_graphs();
         if let Some(peg_in) = self.peg_in_graphs.iter_mut().find(|x| x.id() == graph_id) {
             return peg_in;
         }
@@ -1389,6 +1404,10 @@ impl BitVMClient {
     }
 
     async fn broadcast_tx(&self, tx: &Transaction) -> Result<Txid, Error> {
+        // Output the transaction serialized as a hex string
+        println!("---------------------------");
+        println!("[DEBUG]Broadcasting transaction: {}", bitcoin::consensus::encode::serialize_hex(tx));
+        println!("---------------------------");
         let status_message = broadcast_and_verify(&self.esplora, tx).await?;
 
         let txid = tx.compute_txid();
